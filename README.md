@@ -1,4 +1,5 @@
 # travel-bucket-list
+This was my group project for the subject Web Application & Integrative Programming on 2025.
 A web application designed to help users organize travel destinations, categorize trips, and track progress toward personal travel goals.
 
 Open index.html directly in your browser — no build step, no dependencies, no server required.
