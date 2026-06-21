@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Travel Bucket List</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sky: #2A6B8A;
+      --sky-light: #E8F4F9;
+      --sand: #D4A853;
+      --sand-light: #FDF6E3;
+      --forest: #3A7D5C;
+      --coral: #E06C5A;
+      --ink: #1A2332;
+      --mist: #6B7A8D;
+      --white: #FFFFFF;
+      --surface: #F7F9FC;
+      --border: #DDE3EC;
+      --radius: 12px;
+      --shadow: 0 2px 12px rgba(26,35,50,0.08);
+      --shadow-lg: 0 8px 32px rgba(26,35,50,0.14);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--surface);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .hero {
+      background: linear-gradient(135deg, var(--sky) 0%, #1A3F55 100%);
+      color: white;
+      padding: 48px 24px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: -40px; bottom: -80px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(212,168,83,0.12);
+    }
+    .hero-inner { max-width: 720px; margin: 0 auto; position: relative; }
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--sand);
+      margin-bottom: 12px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+    .hero p {
+      font-size: 15px;
+      color: rgba(255,255,255,0.72);
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap {
+      margin-top: 28px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 100px;
+      height: 8px;
+      overflow: hidden;
+      max-width: 400px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--sand), #F0C060);
+      border-radius: 100px;
+      transition: width 0.5s ease;
+      min-width: 4px;
+    }
+    .progress-label {
+      margin-top: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.65);
+    }
+    .progress-label strong { color: var(--sand); }
+
+    /* ── STATS ROW ── */
+    .stats-row {
+      display: flex;
+      gap: 12px;
+      max-width: 720px;
+      margin: -24px auto 0;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+    .stat-card {
+      flex: 1;
+      background: white;
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+      min-width: 0;
+    }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--sky);
+      line-height: 1;
+    }
+    .stat-num.visited { color: var(--forest); }
+    .stat-num.planned { color: var(--sand); }
+    .stat-label { font-size: 11px; color: var(--mist); margin-top: 4px; font-weight: 500; letter-spacing: 0.5px; }
+
+    /* ── MAIN LAYOUT ── */
+    .main { max-width: 720px; margin: 0 auto; padding: 32px 24px 80px; }
+
+    /* ── ADD FORM ── */
+    .add-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+    }
+    .add-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      margin-bottom: 16px;
+      color: var(--ink);
+    }
+    .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.grow { flex: 1; min-width: 200px; }
+    .form-group label { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--mist); }
+    .form-group input, .form-group select {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: var(--ink);
+      background: var(--surface);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--sky); background: white; }
+    .btn-add {
+      background: var(--sky);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+      align-self: flex-end;
+    }
+    .btn-add:hover { background: #1F5470; }
+    .btn-add:active { transform: scale(0.97); }
+
+    /* ── FILTERS ── */
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filters span { font-size: 12px; font-weight: 600; color: var(--mist); margin-right: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
+    .filter-btn {
+      border: 1.5px solid var(--border);
+      background: white;
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--mist);
+      font-family: 'Inter', sans-serif;
+      transition: all 0.18s;
+    }
+    .filter-btn:hover { border-color: var(--sky); color: var(--sky); }
+    .filter-btn.active { background: var(--sky); border-color: var(--sky); color: white; }
+    .filter-btn.cat-active { background: var(--sand); border-color: var(--sand); color: white; }
+
+    /* ── DESTINATION LIST ── */
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      color: var(--mist);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dest-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .dest-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: box-shadow 0.2s, opacity 0.3s;
+      animation: fadeIn 0.3s ease;
+    }
+    .dest-card:hover { box-shadow: var(--shadow-lg); }
+    .dest-card.visited { border-left: 4px solid var(--forest); }
+    .dest-card.planned { border-left: 4px solid var(--sand); }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: none; } }
+
+    .dest-check {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2.5px solid var(--border);
+      background: white;
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      margin-top: 2px;
+    }
+    .dest-check.checked { background: var(--forest); border-color: var(--forest); }
+    .dest-check svg { display: none; }
+    .dest-check.checked svg { display: block; }
+
+    .dest-body { flex: 1; min-width: 0; }
+    .dest-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .dest-card.visited .dest-name { text-decoration: line-through; color: var(--mist); }
+    .dest-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .dest-category {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 2px 9px;
+      border-radius: 100px;
+    }
+    .cat-adventure { background: #FFF0EC; color: var(--coral); }
+    .cat-culture   { background: #EEF4FF; color: #4A72CC; }
+    .cat-nature    { background: #EAF7F0; color: var(--forest); }
+    .cat-city      { background: #F3EEFF; color: #7B5EA7; }
+    .cat-beach     { background: #FDF6E3; color: var(--sand); }
+    .cat-other     { background: var(--surface); color: var(--mist); }
+    .dest-note { font-size: 13px; color: var(--mist); margin-top: 5px; line-height: 1.4; }
+
+    .dest-actions { display: flex; gap: 6px; margin-left: auto; }
+    .btn-icon {
+      width: 32px; height: 32px;
+      border: none; background: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--mist);
+      transition: background 0.15s, color 0.15s;
+      font-size: 15px;
+    }
+    .btn-icon:hover.delete { background: #FDECEA; color: var(--coral); }
+    .btn-icon:hover.toggle { background: var(--sky-light); color: var(--sky); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 56px 24px;
+      color: var(--mist);
+    }
+    .empty-state .emoji { font-size: 48px; margin-bottom: 16px; }
+    .empty-state p { font-size: 15px; line-height: 1.6; }
+    .empty-state strong { color: var(--ink); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--mist);
+      padding: 24px;
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--sky); text-decoration: none; }
+
+    @media (max-width: 500px) {
+      .stats-row { gap: 8px; }
+      .stat-card { padding: 12px 10px; }
+      .stat-num { font-size: 22px; }
+      .dest-actions { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">✈ Your Journey</div>
+    <h1>Travel Bucket List</h1>
+    <p>Track every place you dream of visiting — and celebrate every destination you've conquered.</p>
+    <div class="progress-wrap">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">Add your first destination to get started.</div>
+  </div>
+</header>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-num" id="statTotal">0</div>
+    <div class="stat-label">Total</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num visited" id="statVisited">0</div>
+    <div class="stat-label">Visited</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num planned" id="statPlanned">0</div>
+    <div class="stat-label">Planned</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ADD FORM -->
+  <div class="add-card">
+    <h2>Add a Destination</h2>
+    <div class="form-row">
+      <div class="form-group grow">
+        <label for="destName">Place</label>
+        <input type="text" id="destName" placeholder="e.g. Kyoto, Japan" autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label for="destCat">Category</label>
+        <select id="destCat">
+          <option value="city">🏙 City</option>
+          <option value="nature">🌿 Nature</option>
+          <option value="beach">🏖 Beach</option>
+          <option value="adventure">🧗 Adventure</option>
+          <option value="culture">🏛 Culture</option>
+          <option value="other">✨ Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" style="margin-top:10px">
+      <div class="form-group grow">
+        <label for="destNote">Note (optional)</label>
+        <input type="text" id="destNote" placeholder="e.g. Cherry blossom season in April" />
+      </div>
+      <div class="form-group">
+        <label>&nbsp;</label>
+        <button class="btn-add" onclick="addDestination()">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <span>Filter</span>
+    <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+    <button class="filter-btn" onclick="setFilter('planned', this)">Planned</button>
+    <button class="filter-btn" onclick="setFilter('visited', this)">Visited</button>
+    <button class="filter-btn" onclick="setCatFilter('city', this)">🏙 City</button>
+    <button class="filter-btn" onclick="setCatFilter('nature', this)">🌿 Nature</button>
+    <button class="filter-btn" onclick="setCatFilter('beach', this)">🏖 Beach</button>
+    <button class="filter-btn" onclick="setCatFilter('adventure', this)">🧗 Adventure</button>
+    <button class="filter-btn" onclick="setCatFilter('culture', this)">🏛 Culture</button>
+  </div>
+
+  <!-- LIST -->
+  <div class="section-title" id="sectionTitle">All Destinations</div>
+  <div class="dest-list" id="destList"></div>
+
+</main>
+
+<footer>
+  Travel Bucket List &mdash; Data saved in your browser. &nbsp;|&nbsp;
+  <a href="https://github.com/" target="_blank">View on GitHub</a>
+</footer>
+
+<script>
+  const STORAGE_KEY = 'travel_bucket_list_v1';
+  let destinations = [];
+  let activeFilter = 'all';
+  let activeCatFilter = null;
+
+  // ── SEED DATA ──
+  const seeds = [
+    { id: uid(), name: 'Kyoto, Japan', category: 'culture', note: 'Cherry blossoms in April', visited: false },
+    { id: uid(), name: 'Patagonia, Argentina', category: 'nature', note: 'Torres del Paine trek', visited: false },
+    { id: uid(), name: 'Santorini, Greece', category: 'beach', note: 'Sunset from Oia', visited: true },
+  ];
+
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      destinations = raw ? JSON.parse(raw) : seeds;
+    } catch { destinations = seeds; }
+  }
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(destinations));
+  }
+
+  function addDestination() {
+    const name = document.getElementById('destName').value.trim();
+    if (!name) { document.getElementById('destName').focus(); shake('destName'); return; }
+    const category = document.getElementById('destCat').value;
+    const note = document.getElementById('destNote').value.trim();
+    destinations.unshift({ id: uid(), name, category, note, visited: false });
+    save(); render();
+    document.getElementById('destName').value = '';
+    document.getElementById('destNote').value = '';
+    document.getElementById('destName').focus();
+  }
+
+  function toggleVisited(id) {
+    const d = destinations.find(x => x.id === id);
+    if (d) { d.visited = !d.visited; save(); render(); }
+  }
+
+  function deleteDestination(id) {
+    destinations = destinations.filter(x => x.id !== id);
+    save(); render();
+  }
+
+  function setFilter(f, el) {
+    activeFilter = f;
+    activeCatFilter = null;
+    document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active','cat-active'); });
+    el.classList.add('active');
+    render();
+  }
+
+  function setCatFilter(cat, el) {
+    if (activeCatFilter === cat) {
+      activeCatFilter = null;
+      el.classList.remove('cat-active');
+      activeFilter = 'all';
+      document.querySelector('.filter-btn').classList.add('active');
+    } else {
+      activeCatFilter = cat;
+      activeFilter = 'all';
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active','cat-active'));
+      el.classList.add('cat-active');
+    }
+    render();
+  }
+
+  function shake(id) {
+    const el = document.getElementById(id);
+    el.style.borderColor = 'var(--coral)';
+    el.animate([{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'none'}], {duration:200, iterations:2});
+    setTimeout(() => { el.style.borderColor = ''; }, 800);
+  }
+
+  const catLabels = { adventure:'🧗 Adventure', culture:'🏛 Culture', nature:'🌿 Nature', city:'🏙 City', beach:'🏖 Beach', other:'✨ Other' };
+
+  function render() {
+    let list = [...destinations];
+    if (activeFilter === 'visited') list = list.filter(d => d.visited);
+    if (activeFilter === 'planned') list = list.filter(d => !d.visited);
+    if (activeCatFilter) list = list.filter(d => d.category === activeCatFilter);
+
+    // Stats
+    const total = destinations.length;
+    const visited = destinations.filter(d => d.visited).length;
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statVisited').textContent = visited;
+    document.getElementById('statPlanned').textContent = total - visited;
+
+    const pct = total ? Math.round((visited / total) * 100) : 0;
+    document.getElementById('progressFill').style.width = (pct || 0) + '%';
+    document.getElementById('progressLabel').innerHTML = total
+      ? `<strong>${visited} of ${total}</strong> destinations visited &mdash; ${pct}% complete`
+      : 'Add your first destination to get started.';
+
+    // Section title
+    const labels = { all: 'All Destinations', visited: 'Visited', planned: 'Planned' };
+    const catTitle = activeCatFilter ? (catLabels[activeCatFilter] || activeCatFilter) : null;
+    document.getElementById('sectionTitle').textContent = catTitle || labels[activeFilter] || 'All Destinations';
+
+    // Cards
+    const container = document.getElementById('destList');
+    if (!list.length) {
+      container.innerHTML = `<div class="empty-state"><div class="emoji">🗺️</div><p>No destinations here yet.<br><strong>Add one above</strong> to start building your list.</p></div>`;
+      return;
+    }
+
+    container.innerHTML = list.map(d => `
+      <div class="dest-card ${d.visited ? 'visited' : 'planned'}">
+        <button class="dest-check ${d.visited ? 'checked' : ''}" onclick="toggleVisited('${d.id}')" title="${d.visited ? 'Mark as planned' : 'Mark as visited'}">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 7L5.5 10.5L12 3.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="dest-body">
+          <div class="dest-name">${esc(d.name)}</div>
+          <div class="dest-meta">
+            <span class="dest-category cat-${d.category}">${catLabels[d.category] || d.category}</span>
+            ${d.visited ? '<span style="font-size:11px;color:var(--forest);font-weight:600;">✓ Visited</span>' : ''}
+          </div>
+          ${d.note ? `<div class="dest-note">${esc(d.note)}</div>` : ''}
+        </div>
+        <div class="dest-actions">
+          <button class="btn-icon toggle" onclick="toggleVisited('${d.id}')" title="${d.visited ? 'Unmark' : 'Mark visited'}">
+            ${d.visited ? '↩' : '✓'}
+          </button>
+          <button class="btn-icon delete" onclick="deleteDestination('${d.id}')" title="Remove">✕</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Enter key on inputs
+  document.addEventListener('DOMContentLoaded', () => {
+    load(); render();
+    ['destName','destNote'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') addDestination(); });
+    });
+  });
+</script>
+</body>
+</html>
