@@ -17,8 +17,7 @@ Local Persistence — All data is saved to localStorage so your list survives pa
 Responsive Design — Works on desktop, tablet, and mobile without any framework.
 
 Get started:
-git clone https://github.com/srathira/travel-bucket-list.git
-cd travel-bucket-list
+git clone https://srathira.github.io/travel-bucket-list/
 open index.html   # macOS
 or double-click index.html on Windows/Linux
 
